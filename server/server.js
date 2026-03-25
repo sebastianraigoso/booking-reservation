@@ -5,7 +5,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-let bookings = []
+let bookings = [] // fake database act like a fake DB (temporary storage)
 
 app.get('/', (req, res) => {
   res.send('API running')

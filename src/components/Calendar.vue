@@ -1,10 +1,3 @@
-<template>
-    <div class="mb-4">
-        <label>Select a date</label>
-        <input type="date" class="form-control" @change="updateDate">
-  </div>
-</template>
-
 <script setup>
     import { ref } from 'vue'
 
@@ -16,3 +9,10 @@
         emit('dateSelected', selectedDate.value)
     }
 </script>
+
+<template>
+    <div class="mb-3">
+        <label>Select a date</label>
+        <input type="date" class="form-control" @change="updateDate">
+    </div>
+</template>

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "vue": "^3.5.29",
     "vue-router": "^4.6.4"
   },
@@ -20,5 +22,18 @@
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
-  }
+  },
+  "description": "",
+  "main": "vite.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebastianraigoso/booking-reservation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sebastianraigoso/booking-reservation/issues"
+  },
+  "homepage": "https://github.com/sebastianraigoso/booking-reservation#readme"
 }
