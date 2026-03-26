@@ -12,10 +12,10 @@ app.get('/', (req, res) => {
 })
 
 app.post('/bookings', (req, res) => {
-  const booking = req.body
+  const booking = req.body // server receive the data
   bookings.push(booking)
 
-  res.json({
+  res.json({ // server responds
     message: 'Booking created',
     booking
   })
