@@ -5,7 +5,7 @@ const bookings = ref([])
 
 async function fetchBookings() {
   const res = await fetch('http://localhost:3000/bookings')
-  bookings.value = await res.json()
+  bookings.value = await res.json() // convert HTTP response
 }
 
 onMounted(fetchBookings)
@@ -16,7 +16,7 @@ onMounted(fetchBookings)
     <h1>Admin Page</h1>
     <router-link to="/">Home</router-link>
     <ul>
-      <li v-for="(b, index) in bookings" :key="index">
+      <li v-for="(b, index) in bookings" :key="index"> <!-- loop through the booking array -->
         {{ b.name }} - {{ b.date }} - {{ b.time }}
       </li>
     </ul>
