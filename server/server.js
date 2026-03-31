@@ -1,4 +1,5 @@
-import db from './config/db.js';
+import 'dotenv/config'
+import db from './config/db.js'
 import express from 'express'
 import cors from 'cors'
 
@@ -6,36 +7,51 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-let bookings = [] // fake database act like a fake DB (temporary storage)
-
 app.get('/', (req, res) => {
   res.send('API running')
 })
 
 app.post('/bookings', (req, res) => {
-  const booking = req.body // server receive the data
-  bookings.push(booking)
+  const { name, email, date, time } = req.body
 
-  res.json({ // server responds
-    message: 'Booking created',
-    booking
+  const checkSql = `
+    SELECT * FROM bookings WHERE date = ? AND time = ?
+  `
+
+  db.query(checkSql, [date, time], (err, results) => {
+    if (err) return res.status(500).json({ error: 'DB error' })
+
+    if (results.length > 0) {
+      return res.status(400).json({ error: 'Time slot already booked' })
+    }
+
+    const insertSql = `
+      INSERT INTO bookings (name, email, date, time)
+      VALUES (?, ?, ?, ?)
+    `
+
+    db.query(insertSql, [name, email, date, time], (err) => {
+      if (err) return res.status(500).json({ error: 'DB error' })
+
+      res.json({ message: 'Booking confirmed' })
+    })
   })
 })
 
 app.get('/bookings', (req, res) => {
-  res.json(bookings)
+  db.query('SELECT * FROM bookings', (err, results) => {
+    if (err) return res.status(500).json({ error: 'DB error' })
+    res.json(results)
+  })
 })
 
-app.get('/test-db', (req, res) => {  // test route for database
-  db.query('SELECT 1', (err, result) => {
-    if (err) {
-      res.send('DB error');
-    } else {
-      res.send('DB working');
-    }
-  });
-});
+app.get('/test-db', (req, res) => {
+  db.query('SELECT 1', (err) => {
+    if (err) return res.send('DB error')
+    res.send('DB working')
+  })
+})
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000')
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on http://localhost:${process.env.PORT}`)
 })

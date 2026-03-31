@@ -17,21 +17,20 @@ async function submitBooking() {
     time: time.value
   }
 
-  try {
-    const res = await fetch('http://localhost:3000/bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(booking)
-    }) // sends the data
-    // res = receives response
+  const res = await fetch('http://localhost:3000/bookings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(booking)
+  })
 
-    if (!res.ok) throw new Error('Request failed')
+  const data = await res.json()
 
-    const data = await res.json() // parsed the response the server send back
-    console.log(data)
-
-  } catch (err) {
-    console.error(err)
+  if (!res.ok) {
+    alert(data.error)
+  } else {
+    alert('Booking successful')
   }
 }
 </script>
