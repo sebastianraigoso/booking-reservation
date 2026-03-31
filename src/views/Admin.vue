@@ -8,7 +8,7 @@ async function fetchBookings() {
   bookings.value = await res.json() // convert HTTP response
 }
 
-onMounted(fetchBookings)
+onMounted(fetchBookings)  // will call everytime we are on admin page
 </script>
 
 <template>
