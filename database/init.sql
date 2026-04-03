@@ -1,6 +1,7 @@
+CREATE DATABASE IF NOT EXISTS booking_app;
 USE booking_app;
 
-CREATE TABLE IF NOT EXISTS bookings (  /* avoids errors if run twice */
+CREATE TABLE IF NOT EXISTS bookings (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
   email VARCHAR(100),
