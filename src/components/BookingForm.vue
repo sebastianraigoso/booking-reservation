@@ -10,6 +10,11 @@ const email = ref('')
 const time = ref('')
 
 async function submitBooking() {
+  if (!name.value || !email.value || !time.value || !props.date) {
+    alert('Please fill all fields') // Change to UI after
+    return
+  }
+
   const booking = {
     name: name.value,
     email: email.value,
@@ -33,6 +38,7 @@ async function submitBooking() {
     alert('Booking successful')
   }
 }
+
 </script>
 
 <template>

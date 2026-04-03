@@ -1,9 +1,9 @@
-import mysql from 'mysql2';
+import mysql from 'mysql2'; // load mysql2 library
 import dotenv from 'dotenv';
 
 dotenv.config(); // read the .env file
 
-const db = mysql.createConnection({ // how to connect to MySQL
+const db = mysql.createConnection({ // how to connect Node to MySQL
   host: process.env.DB_HOST, // where SQL runs (localhost)
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
