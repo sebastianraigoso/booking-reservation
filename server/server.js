@@ -14,19 +14,45 @@ app.get('/', (req, res) => { // test route
 app.post('/bookings', (req, res) => {
   const { name, email, date, time } = req.body
 
-  if (!name || !email || !date || !time) { // check empty fields
+  const cleanName = name?.trim() // "?" prevent cash if undefined
+  const cleanEmail = email?.trim()
+
+  if (!cleanName || !cleanEmail || !date || !time) { // check empty fields
     return res.status(400).json({
       error: 'All fields are required'
     })
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/  // basic email format 
+  if (cleanName.length > 100) {
+    return res.status(400).json({ error: 'Name too long' })
+  }
 
-  if (!emailRegex.test(email)) {
+  const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+  if (!emailRegex.test(cleanEmail)) {
     return res.status(400).json({
       error: 'Invalid email format'
     })
   }
+
+
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+
+  if (!dateRegex.test(date)) {
+    return res.status(400).json({ error: 'Invalid format' })
+  }
+
+  const [year, month, day] = date.split('-').map(Number)
+  const parsedDate = new Date(date)
+
+  if (
+    parsedDate.getFullYear() !== year ||
+    parsedDate.getMonth() + 1 !== month ||
+    parsedDate.getDate() !== day
+  ) {
+    return res.status(400).json({ error: 'Invalid date' })
+  }
+  
   
   const allowedTimes = ['10:00', '11:00', '14:00', '15:00']  // prevent random values
 
@@ -56,7 +82,7 @@ app.post('/bookings', (req, res) => {
       VALUES (?, ?, ?, ?)
     `
 
-    db.query(insertSql, [name, email, date, time], (err) => {
+    db.query(insertSql, [cleanName, cleanEmail, date, time], (err) => {
       if (err) return res.status(500).json({ error: 'DB error' })
 
       res.json({ message: 'Booking confirmed' })
