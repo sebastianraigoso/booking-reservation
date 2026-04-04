@@ -8,3 +8,9 @@ CREATE TABLE IF NOT EXISTS bookings (
   date DATE,
   time VARCHAR(10)
 );
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(100) UNIQUE,
+  password VARCHAR(255)
+);

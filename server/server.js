@@ -2,6 +2,8 @@ import 'dotenv/config'
 import db from './config/db.js'
 import express from 'express'
 import cors from 'cors' // allow Vue to talk to backend
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 const app = express() // create the server
 app.use(cors()) // allow request from frontend (without browser block requests = CORS error)
@@ -10,6 +12,84 @@ app.use(express.json()) // lets you read JSON from request
 app.get('/', (req, res) => { // test route
   res.send('API running')
 })
+
+// REGISTER
+app.post('/register', async (req, res) => {
+  const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Missing fields' })
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const sql = `
+      INSERT INTO users (email, password)
+      VALUES (?, ?)
+    `
+
+    db.query(sql, [email, hashedPassword], (err) => {
+      if (err) {
+        return res.status(400).json({ error: 'User already exists' })
+      }
+
+      res.json({ message: 'User created' })
+    })
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body
+
+  const sql = `SELECT * FROM users WHERE email = ?`
+
+  db.query(sql, [email], async (err, results) => {
+    if (err) return res.status(500).json({ error: 'DB error' })
+
+    if (results.length === 0) {
+      return res.status(400).json({ error: 'User not found' })
+    }
+
+    const user = results[0]
+
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Wrong password' })
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    )
+
+    res.json({ token })
+  })
+})
+
+
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization
+
+  if (!authHeader) {
+    return res.status(401).json({ error: 'No token' })
+  }
+
+  const token = authHeader.split(' ')[1]
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.user = decoded
+    next()
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' })
+  }
+}
+
 
 app.post('/bookings', (req, res) => {
   const { name, email, date, time } = req.body
@@ -52,7 +132,7 @@ app.post('/bookings', (req, res) => {
   ) {
     return res.status(400).json({ error: 'Invalid date' })
   }
-  
+
   
   const allowedTimes = ['10:00', '11:00', '14:00', '15:00']  // prevent random values
 
@@ -90,7 +170,7 @@ app.post('/bookings', (req, res) => {
   })
 })
 
-app.get('/bookings', (req, res) => {
+app.get('/bookings', authMiddleware, (req, res) => {
   db.query('SELECT * FROM bookings', (err, results) => {
     if (err) return res.status(500).json({ error: 'DB error' })
     res.json(results)
